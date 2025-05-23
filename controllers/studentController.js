@@ -34,14 +34,16 @@ const getStudents = async(req,res)=>{
 const getStudentByID = async(req,res)=>{
     try{
 const studentId = req.params.id
-if (!studentId) {
+if (!studentId) {    //if studentId ya id nahi hai...
     return res.status(404).send({
         success:false,
         message: "No student found with the given ID",
     })
 }
+
+
 const [rows]= await db.query(`SELECT * FROM students WHERE id =?`,[studentId]);
-if(rows.length===0){
+if(rows.length===0){   // if no database record found
     return res.status(404).send({
         success:false,
         message:"NO Records Found"
@@ -63,15 +65,21 @@ res.status(200).send({
 //CREATE STUDENT
 const createStudent= async(req,res)=>{
 try {
-  const{name,subject,phone,address,marks}= req.body 
-  if(!name || !subject || !phone || !address || !marks) {
+  //Yeh line req.body se sabhi fields ko destructure kar ke variables me store karti hai.
+const{name,subject,phone,address,marks}= req.body   //req.body.name → name variable me store hoga vse hi or sb  req.body.subject  etc etc....
+  if(!name || !subject || !phone || !address || !marks) {   //if koi field nahi hai to...
     return res.status(500).send({
         success:false,
         message:"please Provide all fields"
     })
   }
   const data = await db.query(`INSERT INTO students (name,subject,phone,address,marks) VALUES (?,?,?,?,?)`,[name,subject,phone,address,marks])
-  if(!data){
+ // INSERT INTO students (...) ka matlab hai:students table me naya row insert karo.
+
+//(name, subject, phone, address, marks) ye table ke columns hain.
+//VALUES (?,?,?,?,?) ka matlab hai: ye values ya data example (kajal,cse,989786756,rdc,45) insert karne ke liye placeholders hain.
+//[name, subject, phone, address, marks] ye values hain jo placeholders ke liye hain.
+  if(!data){  
     return res.status(404).send({
         success:false,
         message:"Error In INSERT QUERY"
@@ -91,8 +99,8 @@ try {
 }
 }
 
-//UPDATE STUDENT
-
+//UPDATE STUDENT    
+ 
 const updateStudent = async (req, res) => {
   try {
     const studentId = req.params.id;
@@ -113,8 +121,8 @@ const updateStudent = async (req, res) => {
     }
 
     // Check if student exists
-    const [existing] = await db.query(`SELECT * FROM students WHERE id = ?`, [studentId]);
-    if (existing.length === 0) {
+    const [existing] = await db.query(`SELECT * FROM students WHERE id = ?`, [studentId]);   //[existing]  bcz data aayega array me...
+    if (existing.length === 0) {   // array me koi record nahi hai to...
       return res.status(404).send({
         success: false,
         message: "Student not found"
@@ -123,11 +131,11 @@ const updateStudent = async (req, res) => {
 
     // Perform the update
     const [result] = await db.query(
-      `UPDATE students SET name = ?, subject = ?, phone = ?, marks = ?, address = ? WHERE id = ?`,
+      `UPDATE students SET name = ?, subject = ?, phone = ?, marks = ?, address = ? WHERE id = ?`,   //SET yeh batata hai ki aapko kaunse columns update karne hain.
       [name, subject, phone, marks, address, studentId]
     );
 
-    if (result.affectedRows === 0) {
+    if (result.affectedRows === 0) {    // affectedRows Ye batata hai kitne rows (records) aapki query se effected (affected) yaani badle gaye hain.
       return res.status(400).send({
         success: false,
         message: "Update failed or no changes made"

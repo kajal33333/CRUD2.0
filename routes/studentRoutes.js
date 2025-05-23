@@ -8,7 +8,7 @@ const router = express.Router();
 
 //Get All students lIST || GET
 
-router.get("/getall",getStudents);
+router.get("/getall",getStudents);   
 
 //GET STUDENT BY ID
 router.get("/get/:id", getStudentByID);
